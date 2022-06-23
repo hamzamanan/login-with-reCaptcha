@@ -7,6 +7,7 @@ function Login_1() {
   const [password, setPassword] = useState("");
   const [status, setLoginStatus] = useState("your login status is False");
   const [loginStatus, setLogin] = useState(false);
+  const [captcha, setCaptchaStatus] = useState(false);
   const setDataUname = (e) => {
     setUserName(e.target.value);
   };
@@ -18,8 +19,6 @@ function Login_1() {
     let login = { username, password };
 
     fetch(`http://localhost:4000/signup/signin`, {
-      "Açcess-Control-Allow-Origin": "*",
-      mode: "no-cors",
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -32,43 +31,52 @@ function Login_1() {
       })
       .then((res) => {
         console.log(res.success);
-        if (res.success) {
+        if (res.success && captcha) {
           setLogin(true);
+          setLoginStatus("You've been logged In");
         } else {
           console.log("falied");
+          setLogin(false);
+          setLoginStatus("sorry couldn't login");
         }
       });
   };
 
   function onChange(value) {
     console.log("Captcha value:", value);
-    let params = {
-      secret: "6LfVYoogAAAAAIblI9cuSmIR3o3spb-CtMjdRwLS",
-      response: value,
-      remoteip: "",
-    };
-    fetch(`https://www.google.com/recaptcha/api/siteverify`, {
-      method: "POST",
-      mode: "no-cors",
-      headers: {
-        Accept: "application/json",
-        "Access-Control-Allow-Origin": "*",
-        "Content-type": "application/json",
-      },
-      body: params,
-    })
-      .then((res) => {
-        console.log("first Respo", res);
-        return res.json();
-      })
-      .then((res) => {
-        console.log("Captcha res", res);
-        if (res.success == true && loginStatus) {
-          setLoginStatus("YOU ARE LOGGEDIN");
-        } else if (res.success == true && loginStatus == false) {
-          setLoginStatus("OOPS SOMETHING WENT WRONG");
-        }
-      });
+    setCaptchaStatus(true);
+    // let params = {
+    //   secret: "6LfVYoogAAAAAIblI9cuSmIR3o3spb-CtMjdRwLS",
+    //   response: value,
+    //   remoteip: "",
+    // };
+    // fetch(`https://www.google.com/recaptcha/api/siteverify`, {
+    //   method: "POST",
+    //   mode: "no-cors",
+    //   headers: {
+    //     Accept: "application/json",
+    //     "Access-Control-Allow-Origin": "*",
+    //     "Content-type": "application/json",
+    //   },
+    //   body: params,
+    // })
+    //   .then((res) => {
+    //     console.log("first Respo", res);
+    //     return res.json();
+    //   })
+    //   .then((res) => {
+    //     console.log("Captcha res", res);
+    //     if (res.success == true && loginStatus) {
+    //       setLoginStatus("YOU ARE LOGGEDIN");
+    //     } else if (res.success == true && loginStatus == false) {
+    //       setLoginStatus("OOPS SOMETHING WENT WRONG");
+    //     }
+    //   });
+    if (loginStatus) {
+      setLoginStatus("You have sucessfull Logged In");
+    } else {
+      setLoginStatus("OOPS SOMETHING WENT WRONG");
+    }
   }
   return (
     <div
@@ -138,7 +146,7 @@ function Login_1() {
 
           <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
             <Button type="primary" htmlType="submit" onClick={LoginApiCall}>
-              Submit
+              Login
             </Button>
           </Form.Item>
         </Form>
